@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In / Log In</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            background-image: url(Bg.jpg);
+            margin: 0;
+        }
+        .container {
+            padding: 50px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            overflow: auto;
+            max-height: 90vh;
+        }
+        form {
+            display: none;
+        }
+        form.active {
+            display: block;
+        }
+        label, input, select {
+            display: block;
+            margin-bottom: 10px;
+            width: 90%;
+            padding: 6px;
+            font-size: 16px;
+        }
+        label {
+            font-size: 20px;
+            font-family: 'Helvetica, sans-serif';
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+        #toggle-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        #toggle-container button {
+            width: 48%;
+            background-color: green;
+            color: aliceblue;
+            font-size: larger;
+            padding: 12px;
+        }
+        button {
+            padding: 10px;
+            background-color: rgb(52, 49, 214);
+            font-weight: bold;
+            color: white;
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="toggle-container">
+            <button id="showSignIn">Sign In</button>
+            <button id="showLogin">Log In</button>
+        </div>
+        <form id="signInForm" action="http://127.0.0.1:3334/Login" method="GET">
+            <h2>Sign In</h2>
+            <label for="signInUsername">Name:</label>
+            <input type="text" id="signInUsername" name="username" required>
+            <label for="signInEmail">Email:</label>
+            <input type="email" id="signInEmail" name="email" required>
+            <label for="signInPassword">Password:</label>
+            <input type="password" id="signInPassword" name="password" required>
+            <label for="signInConfirmPassword">Confirm Password:</label>
+            <input type="password" id="signInConfirmPassword" name="confirmPassword" required>
+            <label for="signInPhone">Phone Number:</label>
+            <input type="tel" id="signInPhone" name="phone" required>
+            <label for="signInAddress">Address:</label>
+            <input type="text" id="signInAddress" name="address" required>
+            <label for="signInUserType">User Type:</label>
+            <select id="signInUserType" name="userType" required>
+                <option value="">Select...</option>
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+            </select>
+            <div id="adminFields" style="display:none;">
+                <label for="gpay">GPay Number or UPI ID:</label>
+                <input type="text" id="gpay" name="gpay">
+                <label for="adminImage">QR Code:</label>
+                <img src="qr.jpg" alt="QR Code" id="qrImage" style="width:100%; height:auto;">
+                <label for="adminImageUpload">Upload Proof:</label>
+                <input type="file" id="adminImageUpload" name="adminImage">
+            </div>
+            <label>
+                <input type="checkbox" id="signInTerms" name="terms" required>
+                I have read the rules and regulations
+            </label>
+            <button type="submit">Submit</button>
+            <p class="error" id="signInError">Please fill out all fields correctly.</p>
+            <p class="error" id="passwordError">Passwords do not match.</p>
+        </form>
+        <form id="loginForm" class="active">
+            <h2>Log In</h2>
+            <label for="loginUsername">Name:</label>
+            <input type="text" id="loginUsername" name="username" required>
+            <label for="loginPassword">Password:</label>
+            <input type="password" id="loginPassword" name="password" required>
+            <button type="submit">Submit</button>
+            <p class="error" id="loginError">Please fill out all fields correctly.</p>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('showSignIn').addEventListener('click', function() {
+            document.getElementById('signInForm').classList.add('active');
+            document.getElementById('loginForm').classList.remove('active');
+        });
+
+        document.getElementById('showLogin').addEventListener('click', function() {
+            document.getElementById('loginForm').classList.add('active');
+            document.getElementById('signInForm').classList.remove('active');
+        });
+
+        document.getElementById('signInUserType').addEventListener('change', function() {
+            const adminFields = document.getElementById('adminFields');
+            if (this.value === 'admin') {
+                adminFields.style.display = 'block';
+            } else {
+                adminFields.style.display = 'none';
+            }
+        });
+
+        document.getElementById('signInForm').addEventListener('submit', function(event) {
+            const username = document.getElementById('signInUsername').value;
+            const email = document.getElementById('signInEmail').value;
+            const password = document.getElementById('signInPassword').value;
+            const confirmPassword = document.getElementById('signInConfirmPassword').value;
+            const phone = document.getElementById('signInPhone').value;
+            const address = document.getElementById('signInAddress').value;
+            const userType = document.getElementById('signInUserType').value;
+            const terms = document.getElementById('signInTerms').checked;
+            const error = document.getElementById('signInError');
+            const passwordError = document.getElementById('passwordError');
+
+            if (username && email && password && confirmPassword && phone && address && userType && terms) {
+                if (password === confirmPassword) {
+                    error.style.display = 'none';
+                    passwordError.style.display = 'none';
+                } else {
+                    event.preventDefault();
+                    passwordError.style.display = 'block';
+                }
+            } else {
+                event.preventDefault();
+                error.style.display = 'block';
+            }
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const error = document.getElementById('loginError');
+
+            if (!username || !password) {
+                event.preventDefault();
+                error.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
